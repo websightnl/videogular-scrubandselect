@@ -1,45 +1,23 @@
-bower-videogular-controls
+videogular-scrubandselect
 =========================
 
-Videogular `controls` plugin repository for distribution on `bower`.
+Videogular `scrubandselect` plugin repository for distribution on `bower`.
 
 ## Install
 
-Install [Videogular](http://www.videogular.com/) `controls` plugin with Bower:
+Install [Videogular](http://www.videogular.com/) `scrubandselect` plugin with Bower:
 
-`bower install videogular-controls`
-
-### Install Videogular
-
-Install [Videogular](http://www.videogular.com/) with Bower:
-
-`bower install videogular`
-
-### Install themes
-
-Install [Videogular](http://www.videogular.com/) themes with Bower:
-
-`bower install videogular-themes-default`
-
-### Install plugins
-
-Install [Videogular](http://www.videogular.com/) plugins with Bower:
-
-`bower install videogular-buffering`
-
-`bower install videogular-overlay-play`
-
-`bower install videogular-poster`
+`bower install videogular-scrubandselect`
 
 ## Documentation
 
-It's available on [Videogular's project Wiki](https://github.com/2fdevs/videogular/wiki).
+Work in progress!
 
 ## License
 
 The MIT License (MIT)
 
-Copyright (c) 2013 2fdevs
+Copyright (c) 2013 eborned
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
