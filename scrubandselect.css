@@ -1,0 +1,12 @@
+videogular vg-scrub-and-select-bar, [videogular] vg-scrub-and-select-bar {
+    width: auto;
+    display: table-cell;
+    cursor: pointer;
+    vertical-align: middle; }
+videogular vg-scrub-and-select-bar [role=slider], [videogular] vg-scrub-and-select-bar [role=slider] {
+    margin-top: 24px;
+    margin-bottom: 24px;
+    height: 2px;
+    background-color: black; }
+videogular vg-scrub-and-select-bar :focus vg-scrub-bar-current-time, [videogular] vg-scrub-and-select-bar :focus vg-scrub-bar-current-time {
+    border-right: 6px black groove; }
