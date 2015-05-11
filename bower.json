@@ -1,6 +1,6 @@
 {
   "name": "videogular-scrubandselect",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "main": "./scrubandselect.js",
   "css": "./scrubandselect.css",
   "dependencies": {
