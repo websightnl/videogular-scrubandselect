@@ -10,3 +10,21 @@ videogular vg-scrub-and-select-bar [role=slider], [videogular] vg-scrub-and-sele
     background-color: black; }
 videogular vg-scrub-and-select-bar :focus vg-scrub-bar-current-time, [videogular] vg-scrub-and-select-bar :focus vg-scrub-bar-current-time {
     border-right: 6px black groove; }
+videogular vg-scrub-and-select-bar vg-scrub-bar-selection{
+    height: 100%;
+    display: block;
+    position: absolute;
+    background-color: rgba(255,0,0,0.4);
+}
+videogular vg-scrub-and-select-bar vg-scrub-bar-selection-options {
+    display: none;
+    background: #000;
+    position: absolute;
+    top: -70%;
+    left: 50%;
+    margin-left: -68px;
+    width: 135px;
+}
+videogular vg-scrub-and-select-bar vg-scrub-bar-selection-options button {
+    color: #fff;
+}

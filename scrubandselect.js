@@ -1,5 +1,4 @@
-/**
- * @license websight v1.0.0 http://websight.nl
+/** @license websight v1.0.0 http://websight.nl
  * Eric Bus
  * License: MIT
  */
@@ -44,16 +43,22 @@ angular.module("nl.websight.videogular.plugins.scrubandselect", [])
             link: function (scope, elem, attr, API) {
                 var isSeeking = false;
                 var isLooping = false;
-                var isDragging = false;
-                var isInDrag = false;
+                var mouseDown = false;
+                var hasDragged = false;
                 var isPlaying = false;
                 var dragStartX = 0;
                 var isPlayingWhenSeeking = false;
                 var touchStartX = 0;
+                var END = 35;
+                var HOME = 36;
                 var LEFT = 37;
                 var RIGHT = 39;
                 var SPACE = 32;
                 var NUM_PERCENT = 5;
+
+                var barLeft = angular.element(elem[0]).offset().left;
+                var selectionElem = angular.element(elem[0].getElementsByTagName("vg-scrub-bar-selection"));
+                var optionsElem = angular.element(elem[0].getElementsByTagName("vg-scrub-bar-selection-options"));
 
                 scope.API = API;
                 scope.ariaTime = function (time) {
@@ -113,12 +118,9 @@ angular.module("nl.websight.videogular.plugins.scrubandselect", [])
                 };
 
                 scope.onScrubBarMouseDown = function onScrubBarMouseDown(event) {
-                    console.log(event);
-                    event = VG_UTILS.fixEventOffset(event);
-
-                    isDragging = true;
-                    isInDrag = false;
-                    dragStartX = event.offsetX;
+                    mouseDown = true;
+                    hasDragged = false;
+                    dragStartX = event.pageX - barLeft;
 
                     // Cancel looping
                     if (isLooping)
@@ -127,24 +129,57 @@ angular.module("nl.websight.videogular.plugins.scrubandselect", [])
                         API.pause();
                     }
 
+                    // Initial bar position
+                    selectionElem.css('width', 0).css('left', dragStartX + 'px');
+
                     scope.$apply();
                 };
 
                 scope.onScrubBarMouseUp = function onScrubBarMouseUp(event) {
-                    isDragging = isInDrag = false;
+                    mouseDown = false;
+
+                    if (hasDragged)
+                    {
+                        // End of drag
+                        hasDragged = false;
+                    }
+                    else
+                    {
+                        API.seekTime(event.offsetX * API.mediaElement[0].duration / elem[0].scrollWidth);
+                        optionsElem.hide();
+                    }
 
                     scope.$apply();
                 };
 
                 scope.onScrubBarMouseMove = function onScrubBarMouseMove(event) {
-                    if (isInDrag) {
+                    if (mouseDown)
+                    {
+                        var realX = event.pageX - barLeft;
+
+                        if (Math.abs(realX - dragStartX) >= 3)
+                        {
+                            hasDragged = true;
+                            optionsElem.show();
+
+                            var direction = (realX < dragStartX) ? 'left' : 'right';
+                            if (direction === 'left')
+                            {
+                                selectionElem.css('left', realX + 'px');
+                                selectionElem.css('width', (dragStartX - realX)  + 'px');
+                            }
+                            else
+                            {
+                                selectionElem.css('width', (realX - dragStartX)  + 'px');
+                            }
+                        }
                     }
 
                     scope.$apply();
                 };
 
                 scope.onScrubBarMouseLeave = function onScrubBarMouseLeave(event) {
-                    isDragging = isInDrag = false;
+                    mouseDown = hasDragged = false;
 
                     scope.$apply();
                 };
@@ -158,6 +193,14 @@ angular.module("nl.websight.videogular.plugins.scrubandselect", [])
                     }
                     else if (event.which === RIGHT || event.keyCode === RIGHT) {
                         API.seekTime(currentPercent + NUM_PERCENT, true);
+                        event.preventDefault();
+                    }
+                    else if (event.which === HOME || event.keyCode === HOME) {
+                        API.seekTime(0, true);
+                        event.preventDefault();
+                    }
+                    else if (event.which === END || event.keyCode === END) {
+                        API.seekTime(100, true);
                         event.preventDefault();
                     }
                     else if (event.which === SPACE || event.keyCode === SPACE) {
