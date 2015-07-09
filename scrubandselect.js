@@ -32,17 +32,20 @@ angular.module("nl.websight.videogular.plugins.scrubandselect", [])
     }]
 )
     .directive("vgScrubAndSelectBar",
-    ["VG_STATES", "VG_UTILS", function (VG_STATES, VG_UTILS) {
+    ["VG_STATES", "VG_UTILS", '$window', function (VG_STATES, VG_UTILS, $window) {
         return {
             restrict: "E",
             require: "^videogular",
             transclude: true,
+            scope: {
+                vgReady: '&',
+                vgSelectionChange: '&'
+            },
             templateUrl: function (elem, attrs) {
                 return attrs.vgTemplate || 'vg-templates/vg-scrub-and-select-bar';
             },
             link: function (scope, elem, attr, API) {
                 var isSeeking = false;
-                var isLooping = false;
                 var mouseDown = false;
                 var hasDragged = false;
                 var isPlaying = false;
@@ -56,14 +59,34 @@ angular.module("nl.websight.videogular.plugins.scrubandselect", [])
                 var SPACE = 32;
                 var NUM_PERCENT = 5;
 
-                var barLeft = angular.element(elem[0]).offset().left;
-                var selectionElem = angular.element(elem[0].getElementsByTagName("vg-scrub-bar-selection"));
-                var optionsElem = angular.element(elem[0].getElementsByTagName("vg-scrub-bar-selection-options"));
+                var barLeft;
+                var selectionElem;
+                var optionsElem;
+
+                function onResize()
+                {
+                    barLeft = angular.element(elem[0]).offset().left;
+                    selectionElem = angular.element(elem[0].getElementsByTagName("vg-scrub-bar-selection"));
+                    optionsElem = angular.element(elem[0].getElementsByTagName("vg-scrub-bar-selection-options"));
+                }
 
                 scope.API = API;
                 scope.ariaTime = function (time) {
                     return Math.round(time / 1000);
                 };
+
+                scope.selection = null;
+
+                scope.$watch(attr.initialSelection, function(newValue, oldValue) {
+                    if (newValue !== oldValue) {
+                        scope.setSelection(newValue);
+                    }
+                });
+
+                angular.element($window).bind('resize', function() {
+                    onResize();
+                })
+                onResize();
 
                 scope.onScrubBarTouchStart = function onScrubBarTouchStart($event) {
                     var event = $event.originalEvent || $event;
@@ -122,15 +145,12 @@ angular.module("nl.websight.videogular.plugins.scrubandselect", [])
                     hasDragged = false;
                     dragStartX = event.pageX - barLeft;
 
-                    // Cancel looping
-                    if (isLooping)
-                    {
-                        isLooping = false;
-                        API.pause();
-                    }
-
                     // Initial bar position
-                    selectionElem.css('width', 0).css('left', dragStartX + 'px');
+                    selectionElem.css('width', 0).css('left', ((dragStartX / elem[0].scrollWidth) * 100) + '%');
+
+                    // Initialize selection information
+                    scope.selection = { start: (event.pageX - barLeft) * API.mediaElement[0].duration / elem[0].scrollWidth, duration: 0 }
+                    scope.vgSelectionChange({ $selection: scope.selection });
 
                     scope.$apply();
                 };
@@ -147,6 +167,8 @@ angular.module("nl.websight.videogular.plugins.scrubandselect", [])
                     {
                         API.seekTime(event.offsetX * API.mediaElement[0].duration / elem[0].scrollWidth);
                         optionsElem.hide();
+                        scope.selection = null;
+                        scope.vgSelectionChange({ $selection: scope.selection });
                     }
 
                     scope.$apply();
@@ -165,17 +187,47 @@ angular.module("nl.websight.videogular.plugins.scrubandselect", [])
                             var direction = (realX < dragStartX) ? 'left' : 'right';
                             if (direction === 'left')
                             {
-                                selectionElem.css('left', realX + 'px');
+                                selectionElem.css('left', ((realX / elem[0].scrollWidth) * 100) + '%');
                                 selectionElem.css('width', (dragStartX - realX)  + 'px');
+
+                                // Update selection information
+                                scope.selection.start = (event.offsetX * API.mediaElement[0].duration / elem[0].scrollWidth);
+                                scope.selection.duration = ((dragStartX - realX) * API.mediaElement[0].duration / elem[0].scrollWidth);
+                                scope.vgSelectionChange({ $selection: scope.selection });
                             }
                             else
                             {
                                 selectionElem.css('width', (realX - dragStartX)  + 'px');
+
+                                // Update selection information
+                                scope.selection.duration = ((realX - dragStartX) * API.mediaElement[0].duration / elem[0].scrollWidth);
+                                scope.vgSelectionChange({ $selection: scope.selection });
                             }
                         }
                     }
 
                     scope.$apply();
+                };
+
+                scope.setSelection = function(selection)
+                {
+                    // Check if media is loaded
+                    if (!API.mediaElement[0].duration)
+                    {
+                        return false;
+                    }
+
+                    // Calculate number of pixels per second
+                    var pixelsPerSecond = elem[0].scrollWidth / API.mediaElement[0].duration;
+
+                    // Set selection element
+                    selectionElem.css({ left: (selection.start * pixelsPerSecond) + 'px', width : (selection.duration * pixelsPerSecond) + 'px' });
+
+                    // Update scope selection
+                    scope.selection = selection;
+
+                    // Show popup
+                    optionsElem.show();
                 };
 
                 scope.onScrubBarMouseLeave = function onScrubBarMouseLeave(event) {
@@ -184,6 +236,7 @@ angular.module("nl.websight.videogular.plugins.scrubandselect", [])
                     scope.$apply();
                 };
 
+                /*
                 scope.onScrubBarKeyDown = function onScrubBarKeyDown(event) {
                     var currentPercent = (API.currentTime / API.totalTime) * 100;
 
@@ -207,6 +260,7 @@ angular.module("nl.websight.videogular.plugins.scrubandselect", [])
                         API.playPause();
                     }
                 };
+                */
 
                 // Disable normal dragging
                 scope.onScrubBarDragStart = function onScrubBarDragStart(event) {
@@ -257,7 +311,16 @@ angular.module("nl.websight.videogular.plugins.scrubandselect", [])
                     elem.bind("mousemove", scope.onScrubBarMouseMove);
                     elem.bind("mouseleave", scope.onScrubBarMouseLeave);
                 }
-            }
+            },
+            controller: function($scope) {
+                this.setSelection = function(selection)
+                {
+                    $scope.setSelection(selection);
+                };
+
+                $scope.vgReady({$API: this});
+            },
+            controllerAs: "API"
         }
     }]
 );
