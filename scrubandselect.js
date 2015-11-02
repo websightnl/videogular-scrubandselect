@@ -209,6 +209,18 @@ angular.module("nl.websight.videogular.plugins.scrubandselect", [])
                     scope.$apply();
                 };
 
+                scope.clearSelection = function()
+                {
+                    // Clear scope selection
+                    scope.selection = null;
+
+                    // Reset selection element
+                    selectionElem.css('width', 0);
+
+                    // Hide popup
+                    optionsElem.hide();
+                };
+
                 scope.setSelection = function(selection)
                 {
                     // Check if media is loaded
@@ -297,6 +309,17 @@ angular.module("nl.websight.videogular.plugins.scrubandselect", [])
                     }
                 );
 
+                scope.$watch(
+                    function () {
+                        return API.sources;
+                    },
+                    function (newVal, oldVal) {
+                        if (newVal != oldVal) {
+                            scope.clearSelection();
+                        }
+                    }
+                );
+
                 // Touch move is really buggy in Chrome for Android, maybe we could use mouse move that works ok
                 if (VG_UTILS.isMobileDevice()) {
                     elem.bind("touchstart", scope.onScrubBarTouchStart);
@@ -316,6 +339,11 @@ angular.module("nl.websight.videogular.plugins.scrubandselect", [])
                 this.setSelection = function(selection)
                 {
                     $scope.setSelection(selection);
+                };
+
+                this.clearSelection = function()
+                {
+                    $scope.clearSelection();
                 };
 
                 $scope.vgReady({$API: this});
