@@ -4,8 +4,8 @@
   "main": "./scrubandselect.js",
   "css": "./scrubandselect.css",
   "dependencies": {
-    "videogular": "1.2.0",
-    "videogular-controls": "1.2.0"
+    "videogular": "~1.2.0",
+    "videogular-controls": "~1.2.0"
   },
   "ignore" : [
     "test"
