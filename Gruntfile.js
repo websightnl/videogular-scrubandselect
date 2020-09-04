@@ -16,7 +16,7 @@ module.exports = function(grunt) {
 				//tagMessage: 'tagging version <%= version %>', //default: 'Version <%= version %>',
 				//tagName: 'v<%= version %>', //default: '<%= version %>'
 
-				file: 'bower.json', //default: package.json
+				file: 'package.json', //default: package.json
 				add: false, //default: true
 				commit: false, //default: true
 				tag: false, //default: true
