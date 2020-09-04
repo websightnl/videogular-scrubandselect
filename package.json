@@ -1,6 +1,7 @@
 {
 	"name": "@musicdirector/videogular-scrubandselect",
-	"version": "0.1.3",
+	"version": "0.1.4",
+  "main": "scrubandselect.js",
 	"devDependencies": {
 		"grunt": "~0.4.1",
 		"grunt-release": "~0.7.0"
