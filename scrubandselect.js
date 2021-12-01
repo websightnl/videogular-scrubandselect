@@ -335,7 +335,7 @@ angular.module("nl.websight.videogular.plugins.scrubandselect", [])
                     elem.bind("mouseleave", scope.onScrubBarMouseLeave);
                 }
             },
-            controller: function($scope) {
+            controller: ['$scope', function($scope) {
                 this.setSelection = function(selection)
                 {
                     $scope.setSelection(selection);
@@ -347,7 +347,7 @@ angular.module("nl.websight.videogular.plugins.scrubandselect", [])
                 };
 
                 $scope.vgReady({$API: this});
-            },
+            }],
             controllerAs: "API"
         }
     }]
