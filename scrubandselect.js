@@ -25,13 +25,13 @@
  */
 "use strict";
 angular.module("nl.websight.videogular.plugins.scrubandselect", [])
-    .run(
+  .run(
     ["$templateCache", function ($templateCache) {
         $templateCache.put("vg-templates/vg-scrub-and-select-bar",
-            '<div role="slider" aria-valuemax="{{ariaTime(API.totalTime)}}" aria-valuenow="{{ariaTime(API.currentTime)}}" aria-valuemin="0" aria-label="Time scrub bar" tabindex="0" ng-transclude ng-keydown="onScrubBarKeyDown($event)"></div>');
+          '<div role="slider" aria-valuemax="{{ariaTime(API.totalTime)}}" aria-valuenow="{{ariaTime(API.currentTime)}}" aria-valuemin="0" aria-label="Time scrub bar" tabindex="0" ng-transclude ng-keydown="onScrubBarKeyDown($event)"></div>');
     }]
-)
-    .directive("vgScrubAndSelectBar",
+  )
+  .directive("vgScrubAndSelectBar",
     ["VG_STATES", "VG_UTILS", '$window', function (VG_STATES, VG_UTILS, $window) {
         return {
             restrict: "E",
@@ -165,7 +165,7 @@ angular.module("nl.websight.videogular.plugins.scrubandselect", [])
                     }
                     else
                     {
-                        API.seekTime(event.offsetX * API.mediaElement[0].duration / elem[0].scrollWidth);
+                        API.seekTime((event.pageX - barLeft) * API.mediaElement[0].duration / elem[0].scrollWidth);
                         optionsElem.hide();
                         scope.selection = null;
                         scope.vgSelectionChange({ $selection: scope.selection });
@@ -191,7 +191,7 @@ angular.module("nl.websight.videogular.plugins.scrubandselect", [])
                                 selectionElem.css('width', (dragStartX - realX)  + 'px');
 
                                 // Update selection information
-                                scope.selection.start = (event.offsetX * API.mediaElement[0].duration / elem[0].scrollWidth);
+                                scope.selection.start = ((event.pageX - barLeft) * API.mediaElement[0].duration / elem[0].scrollWidth);
                                 scope.selection.duration = ((dragStartX - realX) * API.mediaElement[0].duration / elem[0].scrollWidth);
                                 scope.vgSelectionChange({ $selection: scope.selection });
                             }
@@ -299,25 +299,25 @@ angular.module("nl.websight.videogular.plugins.scrubandselect", [])
                 };
 
                 scope.$watch(
-                    function () {
-                        return API.currentState;
-                    },
-                    function (newVal, oldVal) {
-                        if (newVal != oldVal) {
-                            scope.setState(newVal);
-                        }
-                    }
+                  function () {
+                      return API.currentState;
+                  },
+                  function (newVal, oldVal) {
+                      if (newVal != oldVal) {
+                          scope.setState(newVal);
+                      }
+                  }
                 );
 
                 scope.$watch(
-                    function () {
-                        return API.sources;
-                    },
-                    function (newVal, oldVal) {
-                        if (newVal != oldVal) {
-                            scope.clearSelection();
-                        }
-                    }
+                  function () {
+                      return API.sources;
+                  },
+                  function (newVal, oldVal) {
+                      if (newVal != oldVal) {
+                          scope.clearSelection();
+                      }
+                  }
                 );
 
                 // Touch move is really buggy in Chrome for Android, maybe we could use mouse move that works ok
@@ -351,4 +351,4 @@ angular.module("nl.websight.videogular.plugins.scrubandselect", [])
             controllerAs: "API"
         }
     }]
-);
+  );
