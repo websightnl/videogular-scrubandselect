@@ -3,7 +3,7 @@
 	"version": "0.1.5",
 	"main": "scrubandselect.js",
 	"devDependencies": {
-		"grunt": "~0.4.1",
+		"grunt": "~1.5.3",
 		"grunt-release": "~0.7.0"
 	},
 	"engines": {
